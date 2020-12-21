@@ -1,0 +1,17 @@
+#+TITLE: Tincan
+
+* Protocol Used
+All of the messages contain a virtual header of *10 bytes* followed the messages content that has a maximum size of *2048 bytes*
+** Virtual Headers
+All virtual headers have the following format:
+ =<msg_type><length_of_msg>=
+=msg_type= is the type of message that's being sent or received, occupies 4 bytes of header.
+=length_of_msg= is the total length of message content that being sent or received, occupies remaining 6 bytes of header.
+** Types of Messages
++ Chat Message
+=msg_type= of the chat messages are =chat= and it's followed the by the length of chat message being sent or received, 
+padded with zeroes in front to occupy 6 bytes
+
++ File Transfer
+=msg_type= of the file transfer messages are =file= and it's followed by the length of the file being sent and received, 
+padded with zeroes, like the chat message.
