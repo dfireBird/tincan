@@ -1,14 +1,14 @@
 use std::io::Read;
 use std::net::TcpStream;
 use std::str;
-use std::sync::mpsc::Receiver;
+use std::sync::mpsc::Sender;
 
 enum Message {
     Chat,
     File,
 }
 
-fn recv_messages(peer: &mut TcpStream, rx: Receiver<(Message, Vec<u8>)>) {
+fn recv_messages(peer: &mut TcpStream, tx: Sender<(Message, Vec<u8>)>) {
     loop {
         let mut message_type = [0; 4];
         let mut length = [0; 4];
