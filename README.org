@@ -10,7 +10,7 @@ If that's succesful the other peer should respond with a message with format =He
 =<id>= should be the same as the one received if not handshake is not completed and we should discard the connection.
 
 ** Virtual Headers
-All of the messages contain a virtual header of *8 bytes* followed the messages content that has a maximum size of *2048 bytes*.
+All of the messages contain a virtual header of *8 bytes* followed the messages content that has a maximum size of *4096 bytes*.
 All virtual headers have the following format:
  =<msg_type><length_of_msg>=
 =msg_type= is the type of message that's being sent or received, occupies 4 bytes of header.
@@ -23,3 +23,5 @@ padded with zeroes in front to occupy 4 bytes
 + File Transfer
 =msg_type= of the file transfer messages are =file= and it's followed by the length of the file being sent and received, 
 padded with zeroes, like the chat message.
+The first **96 bytes** of the file's message content is the file's name and it's followed by the file data. The file's name should be UTF-8 compatible.
+So file size of file being sent are restricted to less than 4KB.
