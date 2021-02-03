@@ -1,4 +1,6 @@
+use std::error::Error;
 
-fn main() {
-    println!("Hello, world!");
+use tincan::ui;
+fn main() -> Result<(), Box<dyn Error>> {
+    ui::start_ui()
 }
