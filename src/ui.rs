@@ -19,10 +19,15 @@ use tui::{
     Terminal,
 };
 
-use std::{error::Error, io};
+use std::{
+    error::Error,
+    io::{self, Read, Write},
+    net::TcpStream,
+};
 
 use super::events::{Event, Events};
 use super::state::State;
+use super::DEFAULT_PORT;
 
 pub fn start_ui() -> Result<(), Box<dyn Error>> {
     // Terminal initialization
@@ -133,5 +138,22 @@ fn draw_ui(
             .block(Block::default().borders(Borders::ALL).title("Input"));
         f.render_widget(input, chunks[2]);
     })?;
+    Ok(())
+}
+
+fn initiate_connection(state: &mut State, data: &Vec<u8>) -> Result<(), Box<dyn Error>> {
+    let (id, ip) = data.split_at(4);
+    let ip = std::str::from_utf8(ip)?;
+    let mut message = "Hello".as_bytes().to_vec();
+    message.append(&mut id.to_vec());
+
+    let mut connection = TcpStream::connect((ip, DEFAULT_PORT))?;
+    connection.write(&message)?;
+    let mut recv_message = [0; 9];
+    connection.read(&mut recv_message)?;
+    if recv_message.to_vec() == message {
+        state.connection = Some(connection);
+        state.connected = true;
+    }
     Ok(())
 }
