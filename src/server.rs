@@ -5,12 +5,34 @@ use std::net::TcpStream;
 use std::str;
 use std::sync::mpsc::Sender;
 
-enum Message {
+pub enum Message {
+    Connect,
     Chat,
     File,
 }
 
-fn recv_messages(peer: &mut TcpStream, tx: &Sender<(Message, Vec<u8>)>) {
+pub fn handshake(peer: &mut TcpStream, tx: &Sender<(Message, Vec<u8>)>) -> Option<u32> {
+    let mut handshake = [0; 5];
+    let mut id = [0; 4];
+    peer.read(&mut handshake).unwrap();
+    peer.read(&mut id).unwrap();
+    if str::from_utf8(&handshake).unwrap() == "Hello" {
+        let remote_ip = peer.peer_addr().unwrap().ip().to_string();
+        let mut data = id.to_vec();
+        let mut peer_handshake = "Hello".as_bytes().to_vec();
+        peer_handshake.append(&mut id.to_vec());
+
+        data.append(&mut remote_ip.as_bytes().to_vec());
+        tx.send((Message::Connect, data)).unwrap();
+        peer.write(&peer_handshake).unwrap();
+        let id = u32::from_be_bytes(id);
+        Some(id)
+    } else {
+        None
+    }
+}
+
+pub fn recv_messages(peer: &mut TcpStream, tx: &Sender<(Message, Vec<u8>)>) {
     loop {
         let mut message_type = [0; 4];
         let mut length = [0; 4];

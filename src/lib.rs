@@ -1,4 +1,4 @@
 mod events;
-mod server;
+pub mod server;
 mod state;
 pub mod ui;
