@@ -2,7 +2,7 @@
 
 * Protocol Used
 ** Handshake
-Before any of the following messgaes a handshake that must have **8 bytes** of following format must be sent:
+Before any of the following messgaes a handshake that must have **9 bytes** of following format must be sent:
 =Hello<id>=
 =<id>= is 4 byte integer which uniquiely identifies that peer and must be generated at the start of application.
 
