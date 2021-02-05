@@ -23,13 +23,15 @@ use std::{
     error::Error,
     io::{self, Read, Write},
     net::TcpStream,
+    sync::mpsc::Receiver,
 };
 
 use super::events::{Event, Events};
+use super::server::Message;
 use super::state::State;
 use super::DEFAULT_PORT;
 
-pub fn start_ui() -> Result<(), Box<dyn Error>> {
+pub fn start_ui(rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dyn Error>> {
     // Terminal initialization
     enable_raw_mode()?;
     let mut stdout = io::stdout();
@@ -44,6 +46,14 @@ pub fn start_ui() -> Result<(), Box<dyn Error>> {
 
     // UI loop
     loop {
+        for (message, data) in rx.try_iter() {
+            match message {
+                Message::Connect if !state.connected => initiate_connection(&mut state, &data),
+                Message::Chat => recv_chat(&mut state, &data),
+                _ => Ok(()),
+            }?;
+        }
+
         draw_ui(&mut terminal, &state)?;
 
         // Handle Input

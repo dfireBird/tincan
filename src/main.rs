@@ -24,5 +24,5 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
         server::recv_messages(&mut peer, &tx);
     });
-    ui::start_ui()
+    ui::start_ui(&rx)
 }
