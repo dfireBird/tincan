@@ -157,3 +157,9 @@ fn initiate_connection(state: &mut State, data: &Vec<u8>) -> Result<(), Box<dyn 
     }
     Ok(())
 }
+
+fn recv_chat(state: &mut State, data: &Vec<u8>) -> Result<(), Box<dyn Error>> {
+    let message = String::from_utf8(data.to_owned())?;
+    state.messages.push(message);
+    Ok(())
+}
