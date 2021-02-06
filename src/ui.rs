@@ -21,8 +21,10 @@ use tui::{
 
 use std::{
     error::Error,
+    fs,
     io::{self, Read, Write},
     net::TcpStream,
+    path::Path,
     sync::mpsc::Receiver,
 };
 
@@ -161,6 +163,37 @@ fn connect_command(state: &mut State, id: u32) -> Result<(), Box<dyn Error>> {
     let mut data = id.to_be_bytes().to_vec();
     data.append(&mut ip.as_bytes().to_vec());
     initiate_connection(state, &data)
+}
+
+fn send_file(state: &mut State) -> Result<(), Box<dyn Error>> {
+    let input: String = state.input.drain(..).collect();
+    let (_, path) = input.split_at(6);
+    let path = Path::new(path);
+    let file_name = path.file_name().unwrap().to_str().unwrap();
+    let mut file = fs::read(path)?;
+    let mut data = file_name.as_bytes().to_vec();
+
+    if data.len() > 96 {
+        return Ok(());
+    }
+
+    let mut data = if data.len() == 96 {
+        data
+    } else {
+        let capacity = 96 - data.len();
+        let mut zeroes = Vec::with_capacity(capacity);
+        zeroes.append(&mut data);
+        zeroes
+    };
+    data.append(&mut file);
+
+    if let Some(connection) = &state.connection {
+        let mut connection = connection.clone();
+        connection.write(&data)?;
+        Ok(())
+    } else {
+        Ok(())
+    }
 }
 
 fn initiate_connection(state: &mut State, data: &Vec<u8>) -> Result<(), Box<dyn Error>> {
