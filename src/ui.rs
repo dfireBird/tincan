@@ -31,7 +31,7 @@ use super::server::Message;
 use super::state::State;
 use super::DEFAULT_PORT;
 
-pub fn start_ui(rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dyn Error>> {
+pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dyn Error>> {
     // Terminal initialization
     enable_raw_mode()?;
     let mut stdout = io::stdout();
@@ -48,7 +48,11 @@ pub fn start_ui(rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dyn Error>>
     loop {
         for (message, data) in rx.try_iter() {
             match message {
-                Message::Connect if !state.connected => initiate_connection(&mut state, &data),
+                Message::Connect if !state.connected => {
+                    let mut data_ = id.to_be_bytes().to_vec();
+                    data_.append(&mut data.to_owned());
+                    initiate_connection(&mut state, &data_)
+                }
                 Message::Chat => recv_chat(&mut state, &data),
                 _ => Ok(()),
             }?;
