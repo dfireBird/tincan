@@ -8,6 +8,7 @@ use tincan::ui;
 use tincan::DEFAULT_PORT;
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let id = tincan::generate_id();
     let listener = TcpListener::bind((Ipv4Addr::UNSPECIFIED, DEFAULT_PORT))?;
     let (tx, rx) = mpsc::channel();
     let server_handle = thread::spawn(move || {
