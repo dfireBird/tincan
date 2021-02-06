@@ -155,6 +155,14 @@ fn draw_ui(
     Ok(())
 }
 
+fn connect_command(state: &mut State, id: u32) -> Result<(), Box<dyn Error>> {
+    let input: String = state.input.drain(..).collect();
+    let (_, ip) = input.split_at(9);
+    let mut data = id.to_be_bytes().to_vec();
+    data.append(&mut ip.as_bytes().to_vec());
+    initiate_connection(state, &data)
+}
+
 fn initiate_connection(state: &mut State, data: &Vec<u8>) -> Result<(), Box<dyn Error>> {
     let (id, ip) = data.split_at(4);
     let ip = std::str::from_utf8(ip)?;
