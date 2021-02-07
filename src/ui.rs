@@ -116,6 +116,7 @@ fn draw_ui(
                     Constraint::Length(1),
                     Constraint::Min(1),
                     Constraint::Length(3),
+                    Constraint::Length(1),
                 ]
                 .as_ref(),
             )
@@ -153,6 +154,13 @@ fn draw_ui(
             .style(Style::default().fg(Color::Yellow))
             .block(Block::default().borders(Borders::ALL).title("Input"));
         f.render_widget(input, chunks[2]);
+
+        // Info message block
+        let info = Text::from(Span::styled(
+            &state.info_message,
+            Style::default().fg(Color::Red),
+        ));
+        f.render_widget(Paragraph::new(info), chunks[3]);
     })?;
     Ok(())
 }

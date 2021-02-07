@@ -5,6 +5,7 @@ pub struct State {
     pub input: String,
     pub connection: Option<TcpStream>,
     pub connected: bool,
+    pub info_message: String,
 }
 
 impl Default for State {
@@ -14,6 +15,7 @@ impl Default for State {
             messages: Vec::new(),
             connection: None,
             connected: false,
+            info_message: String::new(),
         }
     }
 }
