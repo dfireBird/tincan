@@ -38,8 +38,8 @@ pub fn recv_messages(peer: &mut TcpStream, tx: &Sender<(Message, Vec<u8>)>) {
         peer.read(&mut message_type).unwrap();
         peer.read(&mut length).unwrap();
         let length = u32::from_be_bytes(length);
-        let mut message = Vec::with_capacity(length as usize);
-        peer.read(&mut message).unwrap();
+        let mut message = vec![0u8; length as usize];
+        peer.read_exact(&mut message).unwrap();
 
         let message_type = str::from_utf8(&message_type).unwrap();
         match message_type {
