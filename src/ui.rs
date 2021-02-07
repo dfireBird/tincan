@@ -66,7 +66,13 @@ pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dy
         if let Event::Input(input) = events.next()? {
             match input.code {
                 KeyCode::Enter => {
-                    state.messages.push(state.input.drain(..).collect());
+                    if state.input.contains("?connect") {
+                        connect_command(&mut state, id)?;
+                    } else if state.input.contains("?file") {
+                        send_file(&mut state)?;
+                    } else {
+                        send_message(&mut state)?;
+                    }
                 }
                 KeyCode::Char(c) if c == 'd' && input.modifiers == KeyModifiers::CONTROL => {
                     terminal_deinitialization(&mut terminal)?;
