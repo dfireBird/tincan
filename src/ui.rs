@@ -22,7 +22,7 @@ use tui::{
 use std::{
     error::Error,
     fs,
-    io::{self, Read, Write},
+    io::{self, ErrorKind, Read, Write},
     net::TcpStream,
     path::Path,
     sync::mpsc::Receiver,
@@ -197,7 +197,9 @@ fn send_file(state: &mut State) -> Result<(), Box<dyn Error>> {
 
     if let Some(connection) = &state.connection {
         let mut connection = connection.clone();
-        connection.write(&data)?;
+        if let Err(error) = connection.write(&data) {
+            let _result = handle_connection_error(state, error.kind());
+        }
         Ok(())
     } else {
         Ok(())
@@ -225,4 +227,20 @@ fn recv_chat(state: &mut State, data: &Vec<u8>) -> Result<(), Box<dyn Error>> {
     let message = String::from_utf8(data.to_owned())?;
     state.messages.push(message);
     Ok(())
+}
+
+fn handle_connection_error(state: &mut State, kind: ErrorKind) -> bool {
+    match kind {
+        ErrorKind::ConnectionAborted
+        | ErrorKind::ConnectionRefused
+        | ErrorKind::ConnectionReset
+        | ErrorKind::NotConnected
+        | ErrorKind::TimedOut => {
+            state.info_message = String::from("Connection has aborted");
+            state.connected = false;
+            state.connection = None;
+            true
+        }
+        _ => false,
+    }
 }
