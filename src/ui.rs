@@ -171,6 +171,24 @@ fn connect_command(state: &mut State, id: u32) -> Result<(), Box<dyn Error>> {
     let mut data = id.to_be_bytes().to_vec();
     data.append(&mut ip.as_bytes().to_vec());
     initiate_connection(state, &data)
+fn send_message(state: &mut State) -> Result<(), Box<dyn Error>> {
+    if let Some(connection) = &state.connection {
+        let message: String = state.input.drain(..).collect();
+        let length_bytes = message.len() as u32;
+        let mut data = "chat".as_bytes().to_vec();
+        data.append(&mut length_bytes.to_be_bytes().to_vec());
+        data.append(&mut message.as_bytes().to_vec());
+        let mut connection = connection.clone();
+
+        if let Err(error) = connection.write(&data) {
+            let result = handle_connection_error(state, error.kind());
+            if !result {
+                return Ok(());
+            }
+        }
+        state.messages.push(message);
+    }
+    Ok(())
 }
 
 fn send_file(state: &mut State) -> Result<(), Box<dyn Error>> {
