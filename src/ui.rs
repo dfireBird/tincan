@@ -53,7 +53,11 @@ pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dy
                 Message::Connect if !state.connected => {
                     let mut data_ = id.to_be_bytes().to_vec();
                     data_.append(&mut data.to_owned());
-                    initiate_connection(&mut state, &data_)
+                    let result = initiate_connection(&mut state, &data_);
+                    if let Err(_) = result {
+                        terminal_deinitialization(&mut terminal)?;
+                    }
+                    Ok(())
                 }
                 Message::Chat => recv_chat(&mut state, &data),
                 _ => Ok(()),
@@ -176,7 +180,15 @@ fn connect_command(state: &mut State, id: u32) -> Result<(), Box<dyn Error>> {
     let (_, ip) = input.split_at(9);
     let mut data = id.to_be_bytes().to_vec();
     data.append(&mut ip.as_bytes().to_vec());
-    initiate_connection(state, &data)
+    initiate_connection(state, &data)?;
+    if state.connected {
+        state.info_message = format!("You're connected to ip: {}", ip);
+    } else {
+        state.info_message = String::from("Connection command failed");
+    }
+    Ok(())
+}
+
 fn send_message(state: &mut State) -> Result<(), Box<dyn Error>> {
     if let Some(connection) = &state.connection {
         let message: String = state.input.drain(..).collect();
@@ -202,7 +214,13 @@ fn send_file(state: &mut State) -> Result<(), Box<dyn Error>> {
     let (_, path) = input.split_at(6);
     let path = Path::new(path);
     let file_name = path.file_name().unwrap().to_str().unwrap();
-    let mut file = fs::read(path)?;
+    let mut file = match fs::read(path) {
+        Ok(file) => file,
+        Err(_) => {
+            state.info_message = String::from("File provided can't be accessed");
+            return Ok(());
+        }
+    };
     let mut data = file_name.as_bytes().to_vec();
 
     if data.len() > 96 {
@@ -236,7 +254,15 @@ fn initiate_connection(state: &mut State, data: &Vec<u8>) -> Result<(), Box<dyn 
     let mut message = "Hello".as_bytes().to_vec();
     message.append(&mut id.to_vec());
 
-    let mut connection = TcpStream::connect((ip, DEFAULT_PORT))?;
+    let mut connection: TcpStream;
+    match TcpStream::connect((ip, DEFAULT_PORT)) {
+        Ok(conn) => connection = conn,
+        Err(_) => {
+            state.info_message =
+                String::from("Peer has not started the application or there is no route to peer");
+            return Ok(());
+        }
+    };
     connection.write(&message)?;
     let mut recv_message = [0; 9];
     connection.read(&mut recv_message)?;
