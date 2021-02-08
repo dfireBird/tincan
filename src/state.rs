@@ -1,7 +1,12 @@
 use std::net::TcpStream;
 
+pub enum Author {
+    Me,
+    Other,
+}
+
 pub struct State {
-    pub messages: Vec<String>,
+    pub messages: Vec<(Author, String)>,
     pub input: String,
     pub connection: Option<TcpStream>,
     pub connected: bool,

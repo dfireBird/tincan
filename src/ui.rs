@@ -30,6 +30,7 @@ use std::{
 
 use super::events::{Event, Events};
 use super::server::Message;
+use super::state::Author;
 use super::state::State;
 use super::DEFAULT_PORT;
 
@@ -69,7 +70,7 @@ pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dy
             }?;
         }
 
-        draw_ui(&mut terminal, &state)?;
+        draw_ui(&mut terminal, &state, &id)?;
 
         // Handle Input
         if let Event::Input(input) = events.next()? {
@@ -121,6 +122,7 @@ fn terminal_deinitialization(
 fn draw_ui(
     terminal: &mut Terminal<CrosstermBackend<Stdout>>,
     state: &State,
+    id: &u32,
 ) -> Result<(), Box<dyn Error>> {
     terminal.draw(|f| {
         let chunks = Layout::default()
@@ -154,9 +156,12 @@ fn draw_ui(
         let messages: Vec<ListItem> = state
             .messages
             .iter()
-            .enumerate()
-            .map(|(i, m)| {
-                let content = vec![Spans::from(Span::raw(format!("{}: {}", i, m)))];
+            .map(|(a, m)| {
+                let content = match a {
+                    Author::Me => vec![Spans::from(Span::raw(format!("me: {}", m)))],
+                    Author::Other => vec![Spans::from(Span::raw(format!("{}: {}", id, m)))],
+                };
+
                 ListItem::new(content)
             })
             .collect();
@@ -209,7 +214,7 @@ fn send_message(state: &mut State) -> Result<(), Box<dyn Error>> {
                 return Ok(());
             }
         }
-        state.messages.push(message);
+        state.messages.push((Author::Me, message));
     }
     Ok(())
 }
@@ -292,7 +297,7 @@ fn initiate_connection(state: &mut State, data: &Vec<u8>) -> Result<(), Box<dyn 
 
 fn recv_chat(state: &mut State, data: &Vec<u8>) -> Result<(), Box<dyn Error>> {
     let message = String::from_utf8(data.to_owned())?;
-    state.messages.push(message);
+    state.messages.push((Author::Other, message));
     Ok(())
 }
 
