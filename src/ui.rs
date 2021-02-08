@@ -221,20 +221,30 @@ fn send_file(state: &mut State) -> Result<(), Box<dyn Error>> {
             return Ok(());
         }
     };
-    let mut data = file_name.as_bytes().to_vec();
-
-    if data.len() > 96 {
+    if file.len() > 4096 {
+        state.info_message = String::from("The length of file should be less than 4KB");
+        return Ok(());
+    }
+    if file_name.as_bytes().len() > 96 {
+        state.info_message = String::from("The length of file name should be less than 96 bytes");
         return Ok(());
     }
 
-    let mut data = if data.len() == 96 {
-        data
+    let mut file_name = if file_name.as_bytes().len() == 96 {
+        file_name.as_bytes().to_vec()
     } else {
-        let capacity = 96 - data.len();
-        let mut zeroes = Vec::with_capacity(capacity);
-        zeroes.append(&mut data);
+        let capacity = 96 - file_name.as_bytes().len();
+        let mut zeroes = vec![0u8; capacity];
+        zeroes.append(&mut file_name.as_bytes().to_vec());
         zeroes
     };
+
+    let length = (96 + file.len()) as u32;
+    let mut data = "file".as_bytes().to_vec();
+    data.append(&mut length.to_be_bytes().to_vec());
+    data.append(&mut file_name);
+    data.append(&mut file);
+
     data.append(&mut file);
 
     if let Some(connection) = &state.connection {
