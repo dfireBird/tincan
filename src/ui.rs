@@ -60,6 +60,11 @@ pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dy
                     Ok(())
                 }
                 Message::Chat => recv_chat(&mut state, &data),
+                Message::File => {
+                    let file_name = String::from_utf8_lossy(&data).to_string();
+                    state.info_message = format!("File was recieved with file name: {}", file_name);
+                    Ok(())
+                }
                 _ => Ok(()),
             }?;
         }
@@ -251,6 +256,8 @@ fn send_file(state: &mut State) -> Result<(), Box<dyn Error>> {
         let mut connection = connection.clone();
         if let Err(error) = connection.write(&data) {
             let _result = handle_connection_error(state, error.kind());
+        } else {
+            state.info_message = String::from("The file is sent to the peer");
         }
         Ok(())
     } else {
