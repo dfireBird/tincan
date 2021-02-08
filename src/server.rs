@@ -43,7 +43,7 @@ pub fn recv_messages(peer: &mut TcpStream, tx: &Sender<(Message, Vec<u8>)>) {
 
         let message_type = str::from_utf8(&message_type).unwrap();
         match message_type {
-            "file" => handle_file(peer, &message),
+            "file" => handle_file(peer, &tx, &message),
             "chat" => handle_chat(&message, tx),
             _ => continue,
         }
@@ -55,15 +55,18 @@ fn handle_chat(message: &Vec<u8>, tx: &Sender<(Message, Vec<u8>)>) {
     tx.send((Message::Chat, message.clone())).unwrap();
 }
 
-fn handle_file(peer: &mut TcpStream, file_data: &Vec<u8>) {
+fn handle_file(peer: &mut TcpStream, tx: &Sender<(Message, Vec<u8>)>, file_data: &Vec<u8>) {
     // Split at 96th byte to get the file name
     let (file_name, file_data) = file_data.split_at(96);
 
     // If file name if utf8 then write the file or send the error to the other peer
     if let Ok(file_name) = str::from_utf8(file_name) {
+        let file_name = file_name.trim_start_matches('\0');
         let mut file_path = dirs::download_dir().unwrap();
         file_path.push(file_name);
         fs::write(&file_path.as_path(), file_data).unwrap();
+        tx.send((Message::File, file_name.as_bytes().to_vec()))
+            .unwrap();
     } else {
         let error = "File name is not UTF-8 compatabile";
         let error_msg = [
