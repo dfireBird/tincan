@@ -70,6 +70,10 @@ pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dy
             }?;
         }
 
+        if state.connected {
+            state.info_message = String::from("A peer is connected");
+        }
+
         draw_ui(&mut terminal, &state, &id)?;
 
         // Handle Input
