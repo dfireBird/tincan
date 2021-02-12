@@ -21,7 +21,7 @@ pub struct Events {
 impl Events {
     pub fn new() -> Self {
         let (tx, rx) = mpsc::channel();
-        let tick_rate = Duration::from_millis(200);
+        let tick_rate = Duration::from_millis(TICK_RATE);
 
         let poll_handle = thread::spawn(move || {
             let mut last_tick = Instant::now();
