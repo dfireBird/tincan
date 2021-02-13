@@ -43,7 +43,7 @@ pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dy
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let mut events = Events::new();
+    let events = Events::new();
 
     let mut state = State::default();
 
