@@ -146,6 +146,10 @@ fn draw_ui(
         // Help Message
         let (msg, style) = (
             vec![
+                Span::styled(
+                    "Use ?connect ip to connect. ",
+                    Style::default().add_modifier(Modifier::BOLD),
+                ),
                 Span::raw("Press "),
                 Span::styled("Ctrl-D", Style::default().add_modifier(Modifier::BOLD)),
                 Span::raw(" to exit."),
