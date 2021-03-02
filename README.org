@@ -30,32 +30,6 @@ in the terminal.
 - =?connect <ip address>=: connects to the peer identified by the ip address.
 - =?file <path of file>=: sends the specified file to peer. File that should be transferred should be less than 4kb in size.
 
-* Protocol Used
-** Handshake
-Before any of the following messages a handshake that must have **9 bytes** of following format must be sent:
-=Hello<id>=
-=<id>= is 4 byte integer which uniquely identifies that peer and must be generated at the start of application.
-
-If that's successful the other peer should respond with a message with format =Hello<id>=
-=<id>= should be the same as the one received if not handshake is not completed and we should discard the connection.
-
-** Virtual Headers
-All of the messages contain a virtual header of *8 bytes* followed the messages content that has a maximum size of *4096 bytes*.
-All virtual headers have the following format:
- =<msg_type><length_of_msg>=
-=msg_type= is the type of message that's being sent or received, occupies 4 bytes of header.
-=length_of_msg= is the total length of message content that being sent or received, occupies remaining 4 bytes of header.
-** Types of Messages
-+ Chat Message
-=msg_type= of the chat messages are =chat= and it's followed the by the length of chat message being sent or received, 
-padded with zeroes in front to occupy 4 bytes
-
-+ File Transfer
-=msg_type= of the file transfer messages are =file= and it's followed by the length of the file being sent and received, 
-padded with zeroes, like the chat message.
-The first **96 bytes** of the file's message content is the file's name and it's followed by the file data. The file's name should be UTF-8 compatible.
-So file size of file being sent are restricted to less than 4KB.
-
 * License
 Tincan is primarily distributed under the terms of MIT License.
 See [[file:LICENSE][LICENSE]] for details.
