@@ -1,12 +1,42 @@
 #+TITLE: Tincan
 
+Tincan is TUI-based P2P chat and file sharing program written in Rust
+
+* Installation
+Tincan is currently not pushed in [[https://crates.io][crates.io]] so you have to build from the source.
+Ensure you have [[https://doc.rust-lang.org/cargo/getting-started/installation.html][Cargo]] before building
+** Building
+1. Clone the source
+#+BEGIN_SRC bash
+$ git clone https://github.com/dfireBird/tincan
+#+END_SRC
+2. Use cargo to build
+#+BEGIN_SRC bash
+$ cargo build --release
+#+END_SRC
+3. Install it using cargo, which will copy the binary to =~/.cargo/bin/= (assuming your prefix is =~/.cargo=)
+#+BEGIN_SRC bash
+$ cargo install
+#+END_SRC
+
+* Usage
+To start Tincan simply enter:
+#+BEGIN_SRC bash
+$ tincan
+#+END_SRC
+in the terminal.
+
+** Commands
+- =?connect <ip address>=: connects to the peer identified by the ip address.
+- =?file <path of file>=: sends the specified file to peer. File that should be transferred should be less than 4kb in size.
+
 * Protocol Used
 ** Handshake
-Before any of the following messgaes a handshake that must have **9 bytes** of following format must be sent:
+Before any of the following messages a handshake that must have **9 bytes** of following format must be sent:
 =Hello<id>=
-=<id>= is 4 byte integer which uniquiely identifies that peer and must be generated at the start of application.
+=<id>= is 4 byte integer which uniquely identifies that peer and must be generated at the start of application.
 
-If that's succesful the other peer should respond with a message with format =Hello<id>=
+If that's successful the other peer should respond with a message with format =Hello<id>=
 =<id>= should be the same as the one received if not handshake is not completed and we should discard the connection.
 
 ** Virtual Headers
@@ -25,3 +55,7 @@ padded with zeroes in front to occupy 4 bytes
 padded with zeroes, like the chat message.
 The first **96 bytes** of the file's message content is the file's name and it's followed by the file data. The file's name should be UTF-8 compatible.
 So file size of file being sent are restricted to less than 4KB.
+
+* License
+Tincan is primarily distributed under the terms of MIT License.
+See [[file:LICENSE][LICENSE]] for details.
