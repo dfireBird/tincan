@@ -58,6 +58,7 @@ pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dy
                     if let Err(_) = result {
                         terminal_deinitialization(&mut terminal)?;
                     }
+                    state.info_message = String::from("A peer is connected");
                     Ok(())
                 }
                 Message::Chat => recv_chat(&mut state, &data),
@@ -68,10 +69,6 @@ pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dy
                 }
                 _ => Ok(()),
             }?;
-        }
-
-        if state.connected {
-            state.info_message = String::from("A peer is connected");
         }
 
         draw_ui(&mut terminal, &state, &id)?;
