@@ -1,38 +1,32 @@
 use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture, KeyCode, KeyModifiers},
     execute,
-    terminal::LeaveAlternateScreen,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen},
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use io::Stdout;
 use tui::{
     backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout},
-    style::Modifier,
-    style::{Color, Style},
+    style::{Color, Modifier, Style},
     text::{Span, Spans, Text},
-    widgets::Block,
-    widgets::Borders,
-    widgets::List,
-    widgets::ListItem,
-    widgets::Paragraph,
+    widgets::{Block, Borders, List, ListItem, Paragraph},
     Terminal,
 };
 
 use std::{
     error::Error,
     fs,
-    io::{self, ErrorKind, Read, Write},
+    io::{self, ErrorKind, Read, Stdout, Write},
     net::TcpStream,
     path::Path,
     sync::mpsc::Receiver,
 };
 
-use super::events::{Event, Events};
-use super::server::Message;
-use super::state::Author;
-use super::state::State;
-use super::DEFAULT_PORT;
+use super::{
+    events::{Event, Events},
+    server::Message,
+    state::{Author, State},
+    DEFAULT_PORT,
+};
 
 pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dyn Error>> {
     // Terminal initialization

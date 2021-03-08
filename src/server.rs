@@ -1,9 +1,12 @@
 use dirs;
-use std::fs;
-use std::io::{Read, Write};
-use std::net::TcpStream;
-use std::str;
-use std::sync::mpsc::Sender;
+
+use std::{
+    fs,
+    io::{Read, Write},
+    net::TcpStream,
+    str,
+    sync::mpsc::Sender,
+};
 
 pub enum Message {
     Connect,

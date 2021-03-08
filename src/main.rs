@@ -1,11 +1,11 @@
-use std::error::Error;
-use std::net::{Ipv4Addr, TcpListener, TcpStream};
-use std::sync::mpsc;
-use std::thread;
+use std::{
+    error::Error,
+    net::{Ipv4Addr, TcpListener, TcpStream},
+    sync::mpsc,
+    thread,
+};
 
-use tincan::server;
-use tincan::ui;
-use tincan::DEFAULT_PORT;
+use tincan::{server, ui, DEFAULT_PORT};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let id = tincan::generate_id();
