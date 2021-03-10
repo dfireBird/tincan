@@ -6,9 +6,6 @@ use crossterm::{
 use tui::{
     backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout},
-    style::{Color, Modifier, Style},
-    text::{Span, Spans, Text},
-    widgets::{Block, Borders, List, ListItem, Paragraph},
     Terminal,
 };
 
@@ -27,6 +24,7 @@ use super::{
 };
 
 mod commands;
+mod widgets;
 
 pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dyn Error>> {
     // Terminal initialization
@@ -135,49 +133,20 @@ fn draw_ui(
             .split(f.size());
 
         // Help Message
-        let (msg, style) = (
-            vec![
-                Span::raw("Use "),
-                Span::styled("?connect", Style::default().add_modifier(Modifier::BOLD)),
-                Span::raw(" ip to connect. Press "),
-                Span::styled("Ctrl-D", Style::default().add_modifier(Modifier::BOLD)),
-                Span::raw(" to exit."),
-            ],
-            Style::default().add_modifier(Modifier::RAPID_BLINK),
-        );
-        let mut help_text = Text::from(Spans::from(msg));
-        help_text.patch_style(style);
-        f.render_widget(Paragraph::new(help_text), chunks[0]);
+        let help_text = widgets::help_message_widget();
+        f.render_widget(help_text, chunks[0]);
 
         // Messages Block
-        let messages: Vec<ListItem> = state
-            .messages
-            .iter()
-            .map(|(a, m)| {
-                let content = match a {
-                    Author::Me => vec![Spans::from(Span::raw(format!("me: {}", m)))],
-                    Author::Other => vec![Spans::from(Span::raw(format!("{}: {}", id, m)))],
-                };
-
-                ListItem::new(content)
-            })
-            .collect();
-        let messages =
-            List::new(messages).block(Block::default().borders(Borders::ALL).title("Messages"));
+        let messages = widgets::message_box_widget(state, id);
         f.render_widget(messages, chunks[1]);
 
         // Input Block
-        let input = Paragraph::new(state.input.as_ref())
-            .style(Style::default().fg(Color::Yellow))
-            .block(Block::default().borders(Borders::ALL).title("Input"));
+        let input = widgets::input_box_widget(state);
         f.render_widget(input, chunks[2]);
 
         // Info message block
-        let info = Text::from(Span::styled(
-            &state.info_message,
-            Style::default().fg(Color::Red),
-        ));
-        f.render_widget(Paragraph::new(info), chunks[3]);
+        let info = widgets::info_message_widget(state);
+        f.render_widget(info, chunks[3]);
     })?;
     Ok(())
 }
