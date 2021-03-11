@@ -137,15 +137,15 @@ fn draw_ui(
         f.render_widget(help_text, chunks[0]);
 
         // Messages Block
-        let messages = widgets::message_box_widget(state, id);
+        let messages = widgets::message_box_widget(&state.messages, id);
         f.render_widget(messages, chunks[1]);
 
         // Input Block
-        let input = widgets::input_box_widget(state);
+        let input = widgets::input_box_widget(&state.input);
         f.render_widget(input, chunks[2]);
 
         // Info message block
-        let info = widgets::info_message_widget(state);
+        let info = widgets::info_message_widget(&state.info_message);
         f.render_widget(info, chunks[3]);
     })?;
     Ok(())

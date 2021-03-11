@@ -4,7 +4,7 @@ use tui::{
     widgets::{Block, Borders, List, ListItem, Paragraph},
 };
 
-use super::{Author, State};
+use super::Author;
 pub fn help_message_widget() -> Paragraph<'static> {
     let (msg, style) = (
         vec![
@@ -21,9 +21,8 @@ pub fn help_message_widget() -> Paragraph<'static> {
     Paragraph::new(help_text)
 }
 
-pub fn message_box_widget(state: &State, id: &u32) -> List<'static> {
-    let messages: Vec<ListItem> = state
-        .messages
+pub fn message_box_widget(messages: &Vec<(Author, String)>, id: &u32) -> List<'static> {
+    let messages: Vec<ListItem> = messages
         .iter()
         .map(|(a, m)| {
             let content = match a {
@@ -37,17 +36,14 @@ pub fn message_box_widget(state: &State, id: &u32) -> List<'static> {
     List::new(messages).block(Block::default().borders(Borders::ALL).title("Messages"))
 }
 
-pub fn input_box_widget(state: &State) -> Paragraph {
-    Paragraph::new(state.input.as_ref())
+pub fn input_box_widget(input: &str) -> Paragraph {
+    Paragraph::new(input)
         .style(Style::default().fg(Color::Yellow))
         .block(Block::default().borders(Borders::ALL).title("Input"))
 }
 
-pub fn info_message_widget(state: &State) -> Paragraph {
-    let info = Text::from(Span::styled(
-        &state.info_message,
-        Style::default().fg(Color::Red),
-    ));
+pub fn info_message_widget(info_message: &str) -> Paragraph {
+    let info = Text::from(Span::styled(info_message, Style::default().fg(Color::Red)));
 
     Paragraph::new(info)
 }
