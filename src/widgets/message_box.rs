@@ -7,8 +7,8 @@ use tui::{
 
 use crate::state::Author;
 
-#[derive(Debug)]
-struct MessageBox {
+#[derive(Debug, Clone)]
+pub struct MessageBox {
     messages: Vec<(Author, String)>,
     _id: u32, // TODO: change _id to have proper reference
 }
@@ -22,6 +22,13 @@ impl Widget for MessageBox {
 }
 
 impl MessageBox {
+    pub fn new() -> Self {
+        Self {
+            messages: Vec::new(),
+            _id: 0, // TODO: should initlize to id of peer
+        }
+    }
+
     fn messages_listitem(&self) -> Vec<ListItem> {
         self.messages
             .iter()

@@ -5,8 +5,8 @@ use tui::{
     widgets::{Block, Borders, Paragraph, Widget},
 };
 
-#[derive(Debug)]
-struct InputBox {
+#[derive(Debug, Clone)]
+pub struct InputBox {
     input: String,
 }
 
@@ -20,6 +20,12 @@ impl Widget for InputBox {
 }
 
 impl InputBox {
+    pub fn new() -> Self {
+        Self {
+            input: String::new(),
+        }
+    }
+
     pub fn add_char(&mut self, c: char) {
         self.input.push(c)
     }

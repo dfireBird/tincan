@@ -1,3 +1,3 @@
-mod input_box;
-mod message_box;
-mod text_message;
+pub mod input_box;
+pub mod message_box;
+pub mod text_message;
