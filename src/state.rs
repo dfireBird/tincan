@@ -1,6 +1,7 @@
 use std::net::TcpStream;
 
 #[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Author {
     Me,
     Other,

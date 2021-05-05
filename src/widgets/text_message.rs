@@ -5,7 +5,8 @@ use tui::{
     widgets::{Paragraph, Widget},
 };
 
-struct TextMessage<'a> {
+#[derive(Debug, Clone)]
+pub struct TextMessage<'a> {
     text: Spans<'a>,
 }
 
