@@ -27,7 +27,6 @@ use super::{
 };
 
 mod commands;
-mod widgets;
 
 pub fn start_ui(id: u32, rx: &Receiver<(Message, Vec<u8>)>) -> Result<(), Box<dyn Error>> {
     // Terminal initialization
