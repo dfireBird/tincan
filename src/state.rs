@@ -1,28 +1,31 @@
 use std::net::TcpStream;
 
-#[derive(Debug)]
+use tui::text::Span;
+
+use super::widgets::{input_box::InputBox, message_box::MessageBox, text_message::TextMessage};
+
 #[derive(Debug, Clone)]
 pub enum Author {
     Me,
     Other,
 }
 
-pub struct State {
-    pub messages: Vec<(Author, String)>,
-    pub input: String,
+pub struct State<'a> {
+    pub message_box: MessageBox,
+    pub input_box: InputBox,
     pub connection: Option<TcpStream>,
     pub connected: bool,
-    pub info_message: String,
+    pub info_message: TextMessage<'a>,
 }
 
-impl Default for State {
+impl<'a> Default for State<'a> {
     fn default() -> Self {
-        State {
-            input: String::new(),
-            messages: Vec::new(),
+        Self {
+            input_box: InputBox::new(),
+            message_box: MessageBox::new(),
             connection: None,
             connected: false,
-            info_message: String::new(),
+            info_message: TextMessage::from(Span::raw("")),
         }
     }
 }
