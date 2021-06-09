@@ -3,6 +3,7 @@ pub mod server;
 mod state;
 pub mod ui;
 mod widgets;
+mod network;
 
 use rand::Rng;
 
