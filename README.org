@@ -1,5 +1,7 @@
 #+TITLE: Tincan
 
+* THIS REPOSITORY IS NOT IN ACTIVE DEVELOPEMENT AND HAS BEEN ARCHIVED
+
 Tincan is TUI-based P2P chat and file sharing program written in Rust
 
 * Installation
